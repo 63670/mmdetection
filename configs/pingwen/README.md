@@ -16,19 +16,24 @@ cd /home/tkz/code/github/mmdetection
 python tools/run_experiment.py \
   configs/pingwen/detr_r50_300e.py \
   --work-dir work_dirs/detr_r50_pretrained \
-  --device 1
+  --device 1 \
+  --seed 0
 
 python tools/run_experiment.py \
   configs/pingwen/deformable_detr_r50_300e.py \
   --work-dir work_dirs/deformable_detr_r50_pretrained \
-  --device 1
+  --device 1 \
+  --seed 0
 
 python tools/run_experiment.py \
   configs/pingwen/faster_rcnn_r50_300e.py \
   --work-dir work_dirs/faster_rcnn_r50_pretrained \
-  --device 1
+  --device 1 \
+  --seed 0
 ```
 
 `--device` sets `CUDA_VISIBLE_DEVICES` for both training and test evaluation.
+`--seed` sets MMEngine's `randomness.seed` for training and records the value
+in `work_dirs/<run-name>/seed.txt`.
 This runner is intended for a single-process, single-GPU experiment. Use the
 native distributed MMDetection launch workflow for multi-GPU training.

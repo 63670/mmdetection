@@ -18,6 +18,7 @@ def parse_args():
     parser.add_argument("config", help="Configuration path relative to the repository root.")
     parser.add_argument("--work-dir", required=True, help="Directory for both training and test outputs.")
     parser.add_argument("--device", default="0", help="CUDA_VISIBLE_DEVICES value for this single-process run.")
+    parser.add_argument("--seed", type=int, help="Random seed passed to MMEngine as randomness.seed.")
     parser.add_argument("--amp", action="store_true", help="Enable AMP during training.")
     parser.add_argument("--auto-scale-lr", action="store_true", help="Enable automatic LR scaling during training.")
     parser.add_argument(
@@ -94,8 +95,12 @@ def main():
         train_command.append("--amp")
     if args.auto_scale_lr:
         train_command.append("--auto-scale-lr")
-    if args.cfg_options:
-        train_command.extend(["--cfg-options", *args.cfg_options])
+    cfg_options = list(args.cfg_options or [])
+    if args.seed is not None:
+        cfg_options.append(f"randomness.seed={args.seed}")
+        (work_dir / "seed.txt").write_text(f"{args.seed}\n", encoding="utf-8")
+    if cfg_options:
+        train_command.extend(["--cfg-options", *cfg_options])
     run(train_command, env)
 
     checkpoint = find_best_checkpoint(work_dir)
