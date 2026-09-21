@@ -67,6 +67,22 @@ def find_best_checkpoint(work_dir):
     return max(checkpoints, key=lambda path: path.stat().st_mtime)
 
 
+def remove_extra_checkpoints(work_dir, best_checkpoint):
+    """Remove saved model checkpoints after successful testing, retaining only the best one."""
+    deleted = []
+    for checkpoint in work_dir.glob("*.pth"):
+        if checkpoint.resolve() != best_checkpoint.resolve():
+            checkpoint.unlink()
+            deleted.append(checkpoint.name)
+    last_checkpoint = work_dir / "last_checkpoint"
+    if last_checkpoint.exists():
+        last_checkpoint.unlink()
+        deleted.append(last_checkpoint.name)
+    (work_dir / "deleted_checkpoints.log").write_text(
+        "\n".join(deleted) + ("\n" if deleted else ""), encoding="utf-8"
+    )
+
+
 def main():
     """Train and test one experiment without separating its output directories."""
     args = parse_args()
@@ -114,6 +130,7 @@ def main():
         str(work_dir),
     ]
     run(test_command, env, work_dir / "test_metrics.log")
+    remove_extra_checkpoints(work_dir, checkpoint)
 
 
 if __name__ == "__main__":

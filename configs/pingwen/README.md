@@ -35,5 +35,7 @@ python tools/run_experiment.py \
 `--device` sets `CUDA_VISIBLE_DEVICES` for both training and test evaluation.
 `--seed` sets MMEngine's `randomness.seed` for training and records the value
 in `work_dirs/<run-name>/seed.txt`.
+After the automatic test succeeds, the runner retains only the selected best
+checkpoint and records deleted checkpoint filenames in `deleted_checkpoints.log`.
 This runner is intended for a single-process, single-GPU experiment. Use the
 native distributed MMDetection launch workflow for multi-GPU training.
